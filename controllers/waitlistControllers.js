@@ -5,7 +5,6 @@ const {
 const Waitlists = require("../models/Waitlist");
 const WaitlistData = require("../models/dataDump");
 const { WrapHandler, validateRequest, generateID } = require("../utils");
-const { getFromCache, setToCache } = require("../utils/cache");
 
 exports.createWaitlistForm = WrapHandler(async (req, res) => {
   const body = req?.body;
@@ -19,6 +18,24 @@ exports.createWaitlistForm = WrapHandler(async (req, res) => {
   if (!create) return res.status(400).send(requestFailedMessage);
   create = create.toObject();
   delete create._id;
+  return res.send(create);
+});
+exports.updateWaitlistForm = WrapHandler(async (req, res) => {
+  const body = req?.body;
+  const val = validateRequest(body, ["title"]);
+  if (val) return res.status(400).send(val);
+
+  const { waitlistID } = req.params;
+
+  //get the waitlist
+  let waitlist = this.getWaitlist(req.userID, waitlistID);
+
+  if (!waitlist) return res.status(404).send(requestNotFoundMessage);
+
+  let create = await Waitlists.findByIdAndUpdate(waitlist._id, body);
+
+  if (!create) return res.status(400).send(requestFailedMessage);
+
   return res.send(create);
 });
 exports.getWaitlist = async (waitlistID, userID) => {
