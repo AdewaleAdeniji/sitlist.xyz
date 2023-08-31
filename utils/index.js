@@ -1,7 +1,7 @@
 const jwt = require("jsonwebtoken");
 const argon2 = require("argon2");
-const { verifyToken } = require("../services/UserService");
-const { brands, vulgarWords } = require("../constants");
+const { verifyToken } = require("../services/user.service");
+
 const createHash = async function (plainTextPassword) {
   // return password hash
   return await argon2.hash(plainTextPassword);
@@ -10,7 +10,7 @@ const generateID = () => {
   const timestamp = new Date().getTime().toString(); // get current timestamp as string
   const random = Math.random().toString().substr(2, 5); // generate a random string of length 5
   const userId = timestamp + random; // concatenate the timestamp and random strings
-  return generateRandomEmail(7) + userId + generateRandomEmail(5);
+  return generateRandomString(7) + userId + generateRandomString(5);
 };
 
 // Method to validate the entered password using argon2
@@ -70,50 +70,25 @@ const validateRequest = (obj, keys) => {
     const formattedKey =
       humanReadableKey.charAt(0).toUpperCase() + humanReadableKey.slice(1); // Capitalize the first letter
     if (!(key in obj)) {
-      return `${formattedKey} is required`;
+      return { message: `${formattedKey} is required` };
     }
-    if(key in obj && obj[key] === "") {
-      return `${formattedKey} is required`;
+    if (key in obj && obj[key] === "") {
+      return { message: `${formattedKey} is required` };
     }
   }
   return false;
 };
-const generateRandomEmail = (length = 7)  => {
-  const characters = 'abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
-  let email = '';
+const generateRandomString = (length = 7) => {
+  const characters =
+    "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789";
+  let email = "";
 
   for (let i = 0; i < length; i++) {
     const randomIndex = Math.floor(Math.random() * characters.length);
     email += characters.charAt(randomIndex);
   }
   return email;
-}
-
-
-function isSuspiciousEmail(username) {
-  // const emailParts = email.split("@");
-  // if (emailParts.length !== 2) {
-  //   return false; // Invalid email format
-  // }
-
-  // const username = emailParts[0].toLowerCase();
-  // const domain = emailParts[1].toLowerCase();
-
-  // Check against brand names and vulgar words
-  for (const brand of brands) {
-    if (username.includes(brand)) {
-      return brand; // Suspicious brand in username
-    }
-  }
-
-  for (const word of vulgarWords) {
-    if (username.includes(word)) {
-      return word; // Suspicious vulgar word in username
-    }
-  }
-
-  return false; // Email appears to be legitimate
-}
+};
 
 module.exports = {
   verifyToken,
@@ -125,7 +100,6 @@ module.exports = {
   generateOTP,
   WrapHandler,
   validateRequest,
-  generateRandomEmail,
+  generateRandomString,
   validateUser,
-  isSuspiciousEmail
 };
