@@ -3,8 +3,15 @@ const Schema = mongoose.Schema;
 
 const waitlistSchema = new Schema(
   {
-    waitlistID: String,
-    userID: String,
+    waitlistID: {
+      type: String,
+      immutable: true,
+      unique: true,
+    },
+    userID: {
+      type: String,
+      immutable: true,
+    },
     waitlistTitle: String,
     settings: {
       default: {
