@@ -1,3 +1,4 @@
+const { apiHIT } = require("../controllers/apiController");
 const { verifyToken } = require("../services/user.service");
 const { decrypt } = require("../utils/apiKeys");
 
@@ -29,6 +30,7 @@ exports.validateAPIKey = async (req, res, next) => {
   if (!val) {
     return res.status(403).send({ message: "Invalid API key access" });
   }
+  await apiHIT(val)
   req.userID = val;
   next();
 };
