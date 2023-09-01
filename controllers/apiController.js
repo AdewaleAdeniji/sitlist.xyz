@@ -3,6 +3,7 @@ const {
   requestNotFoundMessage,
 } = require("../constants/messages");
 const Waitlists = require("../models/Waitlist");
+const apiHits = require("../models/apiHits");
 const WaitlistData = require("../models/dataDump");
 const { WrapHandler, validateRequest, generateID } = require("../utils");
 const { generateKeys } = require("../utils/apiKeys");
@@ -17,7 +18,21 @@ exports.apiKeyTest = WrapHandler(async (req, res) => {
   res.send(200);
 });
 // push new form
-
+exports.apiHIT = async (userID, add = true) => {
+  var hit = await apiHits.findOne({ userID });
+  if (!hit) {
+    hit = await apiHits.create({
+      userID: userID,
+      hits: 0,
+    });
+  }
+  var update = hit.hits;
+  if (add) {
+    await apiHits.findByIdAndUpdate(hit._id, { hits: hit.hits + 1 });
+    update++;
+  }
+  return update;
+};
 exports.pushFormData = WrapHandler(async (req, res) => {
   const body = req.body;
   const { waitlistID } = req.params;
@@ -44,6 +59,9 @@ exports.pushFormData = WrapHandler(async (req, res) => {
   });
 
   if (!createDump) return res.status(400).send(requestFailedMessage);
+  await Waitlists.findByIdAndUpdate(waitlist._id, {
+    filled: waitlist.filled + 1,
+  });
   return res.send({ message: "Added to waitlist successfully!" });
 });
 exports.controllerTemplate = WrapHandler(async (req, res) => {});

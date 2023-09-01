@@ -12,7 +12,14 @@ const waitlistSchema = new Schema(
       type: String,
       immutable: true,
     },
-    waitlistTitle: String,
+    filled: {
+      type: Number,
+      default: 0,
+    },
+    waitlistTitle: {
+      type: String,
+      default: 'N/A',
+    },
     settings: {
       default: {
         restrictDomain: false,
