@@ -16,6 +16,7 @@ const {
   getAPIKeys,
   apiKeyTest,
   pushFormData,
+  pushLatLong,
 } = require("./controllers/apiController");
 
 app.use(cors({ origin: "*" }));
@@ -32,6 +33,7 @@ app.get("/waitlists", validateUser, getUserWaitlists);
 app.get("/keys", validateUser, getAPIKeys);
 app.get("/keys/test", validateAPIKey, apiKeyTest);
 app.post("/api/waitlist/:waitlistID", validateAPIKey, pushFormData);
+app.post("/api/headers/waitlist/:waitlistID", validateAPIKey, pushLatLong);
 app.get("/api/waitlist/:waitlistID", validateAPIKey, (_, res) => {
   return res
     .status(400)
@@ -41,10 +43,12 @@ app.get("/api/waitlist/:waitlistID", validateAPIKey, (_, res) => {
 app.get("/health", (_, res) => {
   return res.status(200).send("OK");
 });
-app.get("*", (_, res) => {
+app.get("*", (req, res) => {
+  console.log(req.path, "not found")
   return res.status(404).send("Not found");
 });
-app.post("*", (_, res) => {
+app.post("*", (req, res) => {
+  console.log(req.path, "not found")
   return res.status(404).send("Not found");
 });
 mongoose

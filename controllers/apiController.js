@@ -64,4 +64,26 @@ exports.pushFormData = WrapHandler(async (req, res) => {
   });
   return res.send({ message: "Added to waitlist successfully!" });
 });
+exports.pushLatLong = WrapHandler(async (req, res) => {
+
+  const { waitlistID } = req.params;
+  const waitlist = await getWaitlist(waitlistID, req.userID);
+  if (!waitlist) return res.status(400).send(requestNotFoundMessage);
+  const body = {
+    lat: req.headers?.lat,
+    long: req.headers?.lon
+  }
+  const createDump = await WaitlistData.create({
+    waitlistData: body,
+    waitlistDataKey: body?.waitlistDataKey,
+    waitlistID,
+    dumpID: generateID(),
+  });
+
+  if (!createDump) return res.status(400).send(requestFailedMessage);
+  await Waitlists.findByIdAndUpdate(waitlist._id, {
+    filled: waitlist.filled + 1,
+  });
+  return res.send({ message: "Added to waitlist successfully!" });
+});
 exports.controllerTemplate = WrapHandler(async (req, res) => {});
