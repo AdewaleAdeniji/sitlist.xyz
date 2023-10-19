@@ -12,7 +12,11 @@ const {
   getUserWaitlists,
   getWaitlistFormData,
 } = require("./controllers/waitlistControllers");
-const { getAPIKeys, apiKeyTest, pushFormData } = require("./controllers/apiController");
+const {
+  getAPIKeys,
+  apiKeyTest,
+  pushFormData,
+} = require("./controllers/apiController");
 
 app.use(cors({ origin: "*" }));
 app.use(bodyParser.json({ limit: "50mb" }));
@@ -28,12 +32,21 @@ app.get("/waitlists", validateUser, getUserWaitlists);
 app.get("/keys", validateUser, getAPIKeys);
 app.get("/keys/test", validateAPIKey, apiKeyTest);
 app.post("/api/waitlist/:waitlistID", validateAPIKey, pushFormData);
-
+app.get("/api/waitlist/:waitlistID", validateAPIKey, (_, res) => {
+  return res
+    .status(400)
+    .send({ message: "Invalid request method, POST expected" });
+});
 
 app.get("/health", (_, res) => {
   return res.status(200).send("OK");
 });
-
+app.get("*", (_, res) => {
+  return res.status(404).send("Not found");
+});
+app.post("*", (_, res) => {
+  return res.status(404).send("Not found");
+});
 mongoose
   .connect(process.env.MONGODB_URI, {
     useNewUrlParser: true,
