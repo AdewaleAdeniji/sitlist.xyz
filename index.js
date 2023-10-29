@@ -11,6 +11,7 @@ const {
   getWaitlistForm,
   getUserWaitlists,
   getWaitlistFormData,
+  getWaitlistDataOnly,
 } = require("./controllers/waitlistControllers");
 const {
   getAPIKeys,
@@ -39,6 +40,7 @@ app.get("/api/waitlist/:waitlistID", validateAPIKey, (_, res) => {
     .status(400)
     .send({ message: "Invalid request method, POST expected" });
 });
+app.get("/api/data/waitlist/:waitlistID", validateAPIKey, getWaitlistDataOnly);
 
 app.get("/health", (_, res) => {
   return res.status(200).send("OK");
