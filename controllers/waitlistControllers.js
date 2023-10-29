@@ -93,6 +93,30 @@ exports.getWaitlistFormData = WrapHandler(async (req, res) => {
   }).sort({ createdAt: -1 });
   return res.send({ waitlist, data });
 });
+exports.getWaitlistDataOnly = WrapHandler(async (req, res) => {
+  const { waitlistID } = req.params;
+
+  //get the waitlist
+
+  let waitlist = await this.getWaitlist(waitlistID, req.userID);
+
+  if (!waitlist) return res.status(404).send(requestNotFoundMessage);
+  // waitlist = waitlist;
+  //   delete waitlist._id;
+
+  // now get the data
+  const data = await WaitlistData.find(
+    {
+      waitlistID,
+    },
+    "waitlistData"
+  ).sort({ createdAt: -1 });
+  const responseData = [];
+  data.forEach((d) => {
+    responseData.push(d.waitlistData);
+  });
+  return res.send({ data: responseData });
+});
 exports.getUserWaitlists = WrapHandler(async (req, res) => {
   const userID = req.userID;
   const hits = await this.apiHIT(userID, false);
