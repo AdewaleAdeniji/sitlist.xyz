@@ -108,12 +108,12 @@ exports.getWaitlistDataOnly = WrapHandler(async (req, res) => {
   const data = await WaitlistData.find(
     {
       waitlistID,
-    },
-    "waitlistData"
+    }
   ).sort({ createdAt: -1 });
   const responseData = [];
   data.forEach((d) => {
-    responseData.push(d.waitlistData);
+    const obj = { ...d.waitlistData,  date: d.createdAt };
+    responseData.push(obj);
   });
   return res.send({ data: responseData });
 });
